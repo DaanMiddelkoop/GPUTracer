@@ -1,0 +1,83 @@
+# depslib dependency file v1.0
+1510444165 source:c:\projects\raytraceengine\src\world.cpp
+	"World.h"
+
+1510440816 c:\projects\raytraceengine\include\world.h
+	<GL/glew.h>
+	<GLFW/glfw3.h>
+	<string>
+	<fstream>
+	<iostream>
+	<vector>
+	<Camera.h>
+	<View.h>
+
+1510442085 source:c:\projects\raytraceengine\src\main.cpp
+	<windows.h>
+	<GL/glew.h>
+	<GLFW/glfw3.h>
+	<stdio.h>
+	<iostream>
+	<World.h>
+	<math.h>
+
+1374502282 c:\libraries\glew-2.1.0\include\gl\glew.h
+	<stddef.h>
+	<inttypes.h>
+	<stdint.h>
+	<inttypes.h>
+	<OpenGL/glu.h>
+	<GL/glu.h>
+
+1471521160 c:\libraries\glfw-3.2.1.bin.win32\include\glfw\glfw3.h
+	<stddef.h>
+	<stdint.h>
+	<OpenGL/gl3.h>
+	<OpenGL/gl3ext.h>
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL/glcorearb.h>
+	<GLES/gl.h>
+	<GLES/glext.h>
+	<GLES2/gl2.h>
+	<GLES2/gl2ext.h>
+	<GLES3/gl3.h>
+	<GLES2/gl2ext.h>
+	<GLES3/gl31.h>
+	<GLES2/gl2ext.h>
+	<vulkan/vulkan.h>
+	<GL/gl.h>
+	<GL/glext.h>
+	<GL/glu.h>
+
+1510422622 source:c:\projects\raytraceengine\src\camera.cpp
+	"Camera.h"
+
+1510424889 c:\projects\raytraceengine\include\camera.h
+	<Matrix4f.h>
+	<Vector3f.h>
+	<Vector4f.h>
+
+1510425422 c:\projects\raytraceengine\include\matrix4f.h
+
+1510436313 c:\projects\raytraceengine\include\vector3f.h
+
+1510423346 c:\projects\raytraceengine\include\vector4f.h
+
+1510423061 source:c:\projects\raytraceengine\src\matrix4f.cpp
+	"Matrix4f.h"
+
+1510436339 source:c:\projects\raytraceengine\src\vector3f.cpp
+	"Vector3f.h"
+	<math.h>
+
+1510423215 source:c:\projects\raytraceengine\src\vector4f.cpp
+	"Vector4f.h"
+
+1510440523 source:c:\projects\raytraceengine\src\view.cpp
+	"View.h"
+	<math.h>
+
+1510440347 c:\projects\raytraceengine\include\view.h
+	<Vector3f.h>
+
