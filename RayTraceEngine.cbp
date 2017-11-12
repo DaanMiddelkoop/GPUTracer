@@ -11,9 +11,21 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
+					<Add option="-std=c++11" />
 					<Add option="-g" />
+					<Add directory="../../libraries/glfw-3.2.1.bin.WIN32/include" />
+					<Add directory="include" />
+					<Add directory="../../libraries/glew-2.1.0/include" />
 				</Compiler>
+				<Linker>
+					<Add library="glew32" />
+					<Add library="glfw3dll" />
+					<Add library="opengl32" />
+					<Add directory="../../libraries/glew-2.1.0/lib" />
+					<Add directory="../../libraries/glfw-3.2.1.bin.WIN32/lib-mingw" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/RayTraceEngine" prefix_auto="1" extension_auto="1" />
@@ -22,6 +34,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -31,6 +44,16 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="include/Matrix4f.h" />
+		<Unit filename="include/Vector3f.h" />
+		<Unit filename="include/Vector4f.h" />
+		<Unit filename="include/View.h" />
+		<Unit filename="include/World.h" />
+		<Unit filename="src/Vector3f.cpp" />
+		<Unit filename="src/Vector4f.cpp" />
+		<Unit filename="src/View.cpp" />
+		<Unit filename="src/World.cpp" />
+		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
