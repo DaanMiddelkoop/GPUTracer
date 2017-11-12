@@ -1,8 +1,10 @@
 # depslib dependency file v1.0
-1510444165 source:c:\projects\raytraceengine\src\world.cpp
+1510529493 source:c:\projects\raytraceengine\src\world.cpp
 	"World.h"
+	<String.h>
+	<stdlib.h>
 
-1510440816 c:\projects\raytraceengine\include\world.h
+1510490268 c:\projects\raytraceengine\include\world.h
 	<GL/glew.h>
 	<GLFW/glfw3.h>
 	<string>
@@ -11,8 +13,12 @@
 	<vector>
 	<Camera.h>
 	<View.h>
+	<Triangle.h>
+	<Box.h>
+	<TreeNode.h>
+	<Math.h>
 
-1510442085 source:c:\projects\raytraceengine\src\main.cpp
+1510530012 source:c:\projects\raytraceengine\src\main.cpp
 	<windows.h>
 	<GL/glew.h>
 	<GLFW/glfw3.h>
@@ -80,4 +86,22 @@
 
 1510440347 c:\projects\raytraceengine\include\view.h
 	<Vector3f.h>
+
+1510488591 source:c:\projects\raytraceengine\src\box.cpp
+	"Box.h"
+
+1510488621 c:\projects\raytraceengine\include\box.h
+	<Vector3f.h>
+
+1510495030 c:\projects\raytraceengine\include\triangle.h
+	<Vector3f.h>
+
+1510495017 source:c:\projects\raytraceengine\src\triangle.cpp
+	"Triangle.h"
+
+1510488914 c:\projects\raytraceengine\include\treenode.h
+	<Box.h>
+
+1510488893 source:c:\projects\raytraceengine\src\treenode.cpp
+	"TreeNode.h"
 

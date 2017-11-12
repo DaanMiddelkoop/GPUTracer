@@ -9,43 +9,55 @@
 
 
 float horizontal_direction = 0;
-float vertical_direction = 0;
+float vertical_direction = -1.5;
 
-Vector3f position(-2.0f, 0.5f, -2.0f);
+Vector3f position(-8.0f, 10.0f, -6.0f);
+bool keys[200] = {false};
+
 
 void keyCallBack(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+    if (action == GLFW_PRESS) {
+        keys[key] = true;
+    }
+
+    if (action == GLFW_RELEASE) {
+        keys[key] = false;
+    }
+
+
+}
+
+void handleKeys() {
+    if (keys[GLFW_KEY_W]) {
+
         vertical_direction += 0.1;
     }
-    if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+    if (keys[GLFW_KEY_A]) {
         horizontal_direction -= 0.1;
     }
-    if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+    if (keys[GLFW_KEY_S]) {
         vertical_direction -= 0.1;
     }
-    if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+    if (keys[GLFW_KEY_D]) {
         horizontal_direction += 0.1;
     }
 
-    if (key == GLFW_KEY_I && action == GLFW_PRESS) {
+    if (keys[GLFW_KEY_I]) {
         position.x += cos(horizontal_direction) * 0.1;
         position.z += sin(horizontal_direction) * 0.1;
     }
-    if (key == GLFW_KEY_K && action == GLFW_PRESS) {
+    if (keys[GLFW_KEY_K]) {
         position.x -= cos(horizontal_direction) * 0.1;
         position.z -= sin(horizontal_direction) * 0.1;
     }
-    if (key == GLFW_KEY_J && action == GLFW_PRESS) {
+    if (keys[GLFW_KEY_J]) {
         position.x += sin(horizontal_direction) * 0.1;
         position.z -= cos(horizontal_direction) * 0.1;
     }
-    if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+    if (keys[GLFW_KEY_L]) {
         position.x -= sin(horizontal_direction) * 0.1;
         position.z += cos(horizontal_direction) * 0.1;
     }
-
-
-
 }
 
 int main() {
@@ -93,7 +105,22 @@ int main() {
 
     glfwSetKeyCallback(window, keyCallBack);
 
+    std::vector<Triangle> triangles = std::vector<Triangle>();
+
+    /*for (int i = 0; i < 50; i+= 2) {
+        triangles.push_back(Triangle(Vector3f(-5.0, -1.0 * ((float)i), -5.0), Vector3f( 5.0, -1.0 * ((float)i), -5.0), Vector3f(5.0, -1.0 * ((float)i), 5.0)));
+        triangles.push_back(Triangle(Vector3f(-5.0, -1.0 * ((float)i), -5.0), Vector3f(-5.0, -1.0 * ((float)i),  5.0), Vector3f(5.0, -1.0 * ((float)i), 5.0)));
+    }*/
+
+    triangles.push_back(Triangle(Vector3f( -30.0, 0.0, -30.0), Vector3f(-30.0, 0.0,  30.0), Vector3f(30.0, 0.0, 30.0)));
+    triangles.push_back(Triangle(Vector3f( -30.0, 0.0, -30.0), Vector3f(30.0, 0.0,  -30.0), Vector3f(30.0, 0.0, 30.0)));
+
+    triangles.push_back(Triangle(Vector3f( -1.0, 5.0, -1.0), Vector3f(-1.0, 5.0,  1.0), Vector3f(1.0, 5.0, 1.0)));
+
+    world.setTree(triangles);
+
     while (!glfwWindowShouldClose(window)) {
+        handleKeys();
         glfwPollEvents();
         glViewport(0, 0, world.width, world.height);
         world.trace();

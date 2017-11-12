@@ -1,4 +1,6 @@
 #include "World.h"
+#include <String.h>
+#include <stdlib.h>
 
 World::World(GLFWwindow* window)
 {
@@ -20,6 +22,8 @@ void World::init() {
     tex = createFramebufferTexture();
 
     vao = quadFullScreenVao();
+
+    std::cout << "initing computeprogram" << std::endl;
 
     computeProgram = createComputeProgram();
     initComputeProgram();
@@ -95,10 +99,12 @@ int World::createShader(char* resource, int type) {
     std::vector<GLchar> shaderError((logLength > 1) ? logLength : 1);
     glGetShaderInfoLog(shader, logLength, NULL, &shaderError[0]);
 
+    int maxLogLength = logLength;
     while (logLength >= 1) {
         logLength -= 1;
-        std::cout << shaderError[logLength] << std::endl;
+        std::cout << shaderError[maxLogLength - logLength - 1];
     }
+    std::cout << std::endl;
     if (result == 0) {
         throw 22;
     }
@@ -120,11 +126,16 @@ int World::createQuadProgram() {
     GLint logLength;
     glGetProgramiv(quadProgram, GL_INFO_LOG_LENGTH, &logLength);
     GLint actualLength;
-    GLchar log;
-    glGetProgramInfoLog(quadProgram, logLength, &actualLength, &log);
-    if (actualLength > 0) {
-        std::cout << log << std::endl;
+    std::vector<GLchar> log((logLength > 1) ? logLength : 1);
+    glGetProgramInfoLog(quadProgram, logLength, &actualLength, &log[0]);
+
+
+    int maxLogLength = logLength;
+    while (logLength >= 1) {
+        logLength -= 1;
+        std::cout << log[maxLogLength - logLength - 1];
     }
+    std::cout << std::endl;
     if (linked == 0) {
         throw 21;
     }
@@ -137,18 +148,27 @@ int World::createComputeProgram() {
     glAttachShader(program, cshader);
     glLinkProgram(program);
     GLint linked = GL_FALSE;
+
+    std::cout << "reaching this? " << std::endl;
     glGetProgramiv(program, GL_LINK_STATUS, &linked);
     GLint logLength;
     glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
     GLint actualLength;
-    GLchar log;
-    glGetProgramInfoLog(program, logLength, &actualLength, &log);
-    if (actualLength > 0) {
-        std::cout << log << std::endl;
+    std::vector<GLchar> log((logLength > 1) ? logLength : 1);
+    glGetProgramInfoLog(program, logLength, &actualLength, &log[0]);
+    std::cout << "i am confused" << std::endl;
+
+    int maxLogLength = logLength;
+    while (logLength >= 1) {
+        logLength -= 1;
+        std::cout << log[maxLogLength - logLength - 1];
     }
+    std::cout << std::endl;
     if (linked == 0) {
         throw 20;
     }
+
+    std::cout << "end" << std::endl;
     return program;
 }
 
@@ -188,8 +208,350 @@ int World::createFramebufferTexture()
     return tex;
 }
 
+void World::setTree(std::vector<Triangle> triangles) {
+    std::vector<TreeNode> tree;
+    std::vector<Box> boxes;
+
+    for (int i = 0; i < triangles.size(); i++) {
+        triangles[i].index = i;
+    }
+
+
+    Box bounding = boundaries(&triangles);
+    tree.push_back(TreeNode(bounding, -1, -1, -1, -1));
+    int node_index = tree.size() - 1;
+
+    std::cout << "reaching this? abc" << std::endl;
+
+    std::vector<Triangle> triangles1;
+    std::vector<Triangle> triangles2;
+    split_triangles(&triangles, &triangles1, &triangles2, bounding);
+    std::cout << "Starting tree, amount of triangles: " << triangles.size() << std::endl;
+    std::cout << "Start tree branches, length of first: " << triangles1.size() << ", second: " << triangles2.size() << std::endl;
+
+    buildTree(&triangles1, &tree, &boxes, node_index, false);
+    std::cout << "Finished building half the tree." << std::endl;
+    buildTree(&triangles2, &tree, &boxes, node_index, true);
+    std::cout << "Finished building tree." << std::endl;
+
+
+
+    void* tree_data = malloc(sizeof(float) * tree.size() * 12);
+    for (int i = 0; i < tree.size(); i++) {
+        std::cout << "treenode min " << i << ": x " << tree[i].bounding.minimal.x << ", y " << tree[i].bounding.minimal.y << ", z " << tree[i].bounding.minimal.z << std::endl;
+        std::cout << "treenode max " << i << ": x " << tree[i].bounding.maximal.x << ", y " << tree[i].bounding.maximal.y << ", z " << tree[i].bounding.maximal.z << std::endl;
+        std::cout << tree[i].child1 << ", " << tree[i].child2 << std::endl;
+        std::cout << tree[i].t1 << ", " << tree[i].t2 << std::endl;
+
+        ((float*)tree_data)[(i * 12) + 0] = tree[i].bounding.minimal.x;
+        ((float*)tree_data)[(i * 12) + 1] = tree[i].bounding.minimal.y;
+        ((float*)tree_data)[(i * 12) + 2] = tree[i].bounding.minimal.z;
+
+        ((float*)tree_data)[(i * 12) + 4] = tree[i].bounding.maximal.x;
+        ((float*)tree_data)[(i * 12) + 5] = tree[i].bounding.maximal.y;
+        ((float*)tree_data)[(i * 12) + 6] = tree[i].bounding.maximal.z;
+
+        ((int*)tree_data)[(i * 12) + 8] = tree[i].child1;
+        ((int*)tree_data)[(i * 12) + 9] = tree[i].child2;
+        ((int*)tree_data)[(i * 12) + 10] = tree[i].t1;
+        ((int*)tree_data)[(i * 12) + 11] = tree[i].t2;
+    }
+    GLuint ssbo = 0;
+    glGenBuffers(1, &ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * tree.size() * 12, tree_data, GL_DYNAMIC_COPY);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p, tree_data, sizeof(float) * tree.size() * 12);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    GLuint block_index = 0;
+    block_index = glGetProgramResourceIndex(computeProgram, GL_SHADER_STORAGE_BLOCK, "tree_b");
+
+    GLuint ssbo_binding_point_index = 1;
+    glShaderStorageBlockBinding(computeProgram, block_index, ssbo_binding_point_index);
+
+    glShaderStorageBlockBinding(computeProgram, block_index, 60);
+    GLuint binding_point_index = 60;
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point_index, ssbo);
+
+    float* triangle_data = new float[triangles.size() * 12];
+
+    for (int i = 0; i < triangles.size(); i++) {
+        triangle_data[(i * 12) + 0] = triangles[i].a.x;
+        triangle_data[(i * 12) + 1] = triangles[i].a.y;
+        triangle_data[(i * 12) + 2] = triangles[i].a.z;
+
+        triangle_data[(i * 12) + 4] = triangles[i].b.x;
+        triangle_data[(i * 12) + 5] = triangles[i].b.y;
+        triangle_data[(i * 12) + 6] = triangles[i].b.z;
+
+        triangle_data[(i * 12) + 8] = triangles[i].c.x;
+        triangle_data[(i * 12) + 9] = triangles[i].c.y;
+        triangle_data[(i * 12) + 10] = triangles[i].c.z;
+    }
+
+    ssbo = 0;
+    glGenBuffers(1, &ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * triangles.size() * 12, triangle_data, GL_DYNAMIC_COPY);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p, triangle_data, sizeof(float) * triangles.size() * 12);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    block_index = 0;
+    block_index = glGetProgramResourceIndex(computeProgram, GL_SHADER_STORAGE_BLOCK, "triangles_b");
+
+    ssbo_binding_point_index = 2;
+    glShaderStorageBlockBinding(computeProgram, block_index, ssbo_binding_point_index);
+
+    glShaderStorageBlockBinding(computeProgram, block_index, 80);
+    binding_point_index = 80;
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point_index, ssbo);
+
+}
+
+void World::buildTree(std::vector<Triangle>* triangles, std::vector<TreeNode>* tree, std::vector<Box>* boxes, int parent, bool childn) {
+    std::cout << "Starting collecting boundaries" << std::endl;
+    Box bounding = boundaries(triangles);
+    std::cout << "Reaching this with " << triangles->size() << " triangles left" << std::endl;
+
+    if (triangles->size() <= 2) {
+        if (triangles->size() == 2) {
+            tree->push_back(TreeNode(bounding, -1, -1, (*triangles)[0].index, (*triangles)[1].index));
+        } else {
+            tree->push_back(TreeNode(bounding, -1, -1, (*triangles)[0].index, -1));
+        }
+
+        if (childn == false) {
+            (*tree)[parent].child1 = tree->size() - 1;
+        } else {
+            (*tree)[parent].child2 = tree->size() - 1;
+        }
+        return;
+    }
+
+
+    tree->push_back(TreeNode(bounding, -1, -1, -1, -1));
+    int node_index = tree->size() - 1;
+
+    if (childn == false) {
+        (*tree)[parent].child1 = node_index;
+    } else {
+        (*tree)[parent].child2 = node_index;
+    }
+
+    std::vector<Triangle> triangles1;
+    std::vector<Triangle> triangles2;
+    split_triangles(triangles, &triangles1, &triangles2, bounding);
+    buildTree(&triangles1, tree, boxes, node_index, false);
+    buildTree(&triangles2, tree, boxes, node_index, true);
+}
+
+Box World::boundaries(std::vector<Triangle>* triangles) {
+    Box box = Box();
+
+    std::cout << "Length of triangles: " << triangles->size() << std::endl;
+    if (triangles->size() <= 0) {
+        Vector3f minimal = Vector3f(0.0, 0.0, 0.0);
+        Vector3f maximal = Vector3f(0.0, 0.0, 0.0);
+        box.minimal = minimal;
+        box.maximal = maximal;
+        return box;
+    }
+
+    Vector3f minimal((*triangles)[0].a.x, (*triangles)[0].a.y, (*triangles)[0].a.z);
+    Vector3f maximal((*triangles)[0].a.x, (*triangles)[0].a.y, (*triangles)[0].a.z);
+
+    for (int i = 0; i < triangles->size(); i++) {
+        Triangle* triangle = &(*triangles)[i];
+        if (triangle->a.x < minimal.x) {
+            minimal.x = triangle->a.x;
+        }
+        if (triangle->a.y < minimal.y) {
+            minimal.y = triangle->a.y;
+        }
+        if (triangle->a.z < minimal.z) {
+            minimal.z = triangle->a.z;
+        }
+
+        if (triangle->b.x < minimal.x) {
+            minimal.x = triangle->b.x;
+        }
+        if (triangle->b.y < minimal.y) {
+            minimal.y = triangle->b.y;
+        }
+        if (triangle->b.z < minimal.z) {
+            minimal.z = triangle->b.z;
+        }
+
+        if (triangle->c.x < minimal.x) {
+            minimal.x = triangle->c.x;
+        }
+        if (triangle->c.y < minimal.y) {
+            minimal.y = triangle->c.y;
+        }
+        if (triangle->c.z < minimal.z) {
+            minimal.z = triangle->c.z;
+        }
+
+        if (triangle->a.x > maximal.x) {
+            maximal.x = triangle->a.x;
+        }
+        if (triangle->a.y > maximal.y) {
+            maximal.y = triangle->a.y;
+        }
+        if (triangle->a.z > maximal.z) {
+            maximal.z = triangle->a.z;
+        }
+
+        if (triangle->b.x > maximal.x) {
+            maximal.x = triangle->b.x;
+        }
+        if (triangle->b.y > minimal.y) {
+            maximal.y = triangle->b.y;
+        }
+        if (triangle->b.z > maximal.z) {
+            maximal.z = triangle->b.z;
+        }
+
+        if (triangle->c.x > maximal.x) {
+            maximal.x = triangle->c.x;
+        }
+        if (triangle->c.y > maximal.y) {
+            maximal.y = triangle->c.y;
+        }
+        if (triangle->c.z > maximal.z) {
+            maximal.z = triangle->c.z;
+        }
+    }
+    box.minimal = minimal;
+    box.maximal = maximal;
+    return box;
+}
+
+void World::split_triangles(std::vector<Triangle>* source, std::vector<Triangle>* part1, std::vector<Triangle>* part2, Box bounding) {
+    float av_x = 0.0f;
+    float av_y = 0.0f;
+    float av_z = 0.0f;
+
+    std::vector<float> xs;
+    std::vector<float> ys;
+    std::vector<float> zs;
+
+    for (int i = 0; i < source->size(); i++) {
+        Triangle* t = &(*source)[i];
+        float x = t->a.x + t->b.x + t->c.x;
+        float y = t->a.y + t->b.y + t->c.y;
+        float z = t->a.z + t->b.z + t->c.z;
+
+        xs.push_back(x);
+        ys.push_back(y);
+        zs.push_back(z);
+
+        av_x += x;
+        av_y += y;
+        av_z += z;
+    }
+
+    std::cout << "Somewhere in split triangles..." << std::endl;
+
+    av_x /= source->size();
+    av_y /= source->size();
+    av_z /= source->size();
+
+    float stdx = 0.0f;
+    float stdy = 0.0f;
+    float stdz = 0.0f;
+
+
+
+    for (int i = 0; i < source->size(); i++) {
+        stdx += sqrt((xs[i] - av_x) * (xs[i] - av_x));
+        stdy += sqrt((ys[i] - av_y) * (ys[i] - av_y));
+        stdz += sqrt((zs[i] - av_z) * (zs[i] - av_z));
+    }
+
+    std::cout << "av_x, av_y, av_z: " << av_x << ", " << av_y << ", " << av_z << std::endl;
+    std::cout << "stdx, stdy, stdz: " << stdx << ", " << stdy << ", " << stdz << std::endl;
+
+    bool switching = true;
+
+    if (stdx >= stdy && stdx >= stdz) {
+
+        std::cout << "Should reach this" << std::endl;
+        for (int i = 0; i < source->size(); i++) {
+            std::cout << "x of element " << i << ": " << xs[i] << std::endl;
+            if (xs[i] > av_x) {
+                part1->push_back((*source)[i]);
+            } else if (xs[i] == av_x) {
+                if (switching) {
+                    part2->push_back((*source)[i]);
+                } else {
+                    part1->push_back((*source)[i]);
+                }
+                switching = !switching;
+
+            } else {
+                part2->push_back((*source)[i]);
+            }
+        }
+
+        std::cout << "Splitted triangles, len of first: " << part1->size() << ", second: " << part2->size() << std::endl;
+        return;
+    }
+
+    std::cout << "Possibly pushed stuff from source into part1 or 2" << std::endl;
+    if (stdy >= stdx && stdy >= stdz) {
+        for (int i = 0; i < source->size(); i++) {
+             if (ys[i] > av_y) {
+                part1->push_back((*source)[i]);
+            } else if (ys[i] == av_y) {
+                if (switching) {
+                    part2->push_back((*source)[i]);
+                } else {
+                    part1->push_back((*source)[i]);
+                }
+
+                switching = !switching;
+            } else {
+                part2->push_back((*source)[i]);
+            }
+        }
+
+        std::cout << "Splitted triangles, len of first: " << part1->size() << ", second: " << part2->size() << std::endl;
+        return;
+    }
+    std::cout << "Possibly pushed stuff from source into part1 or 2" << std::endl;
+    if (stdz >= stdz && stdz >= stdx) {
+        for (int i = 0; i < source->size(); i++) {
+             if (zs[i] > av_z) {
+                part1->push_back((*source)[i]);
+            } else if (zs[i] == av_z) {
+                if (switching) {
+                    part2->push_back((*source)[i]);
+                } else {
+                    part1->push_back((*source)[i]);
+                }
+                switching = !switching;
+            } else {
+                part2->push_back((*source)[i]);
+            }
+        }
+
+        std::cout << "Splitted triangles, len of first: " << part1->size() << ", second: " << part2->size() << std::endl;
+        return;
+    }
+    std::cout << "Possibly pushed stuff from source into part1 or 2 last" << std::endl;
+
+}
+
 void World::trace() {
-    std::cout << "test" << std::endl;
     glUseProgram(computeProgram);
 
     glUniform3f(eyeUniform, view.getPosition().x, view.getPosition().y, view.getPosition().z);
