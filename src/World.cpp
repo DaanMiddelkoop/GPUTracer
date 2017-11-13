@@ -238,10 +238,10 @@ void World::setTree(std::vector<Triangle> triangles) {
 
     void* tree_data = malloc(sizeof(float) * tree.size() * 12);
     for (int i = 0; i < tree.size(); i++) {
-        std::cout << "treenode min " << i << ": x " << tree[i].bounding.minimal.x << ", y " << tree[i].bounding.minimal.y << ", z " << tree[i].bounding.minimal.z << std::endl;
-        std::cout << "treenode max " << i << ": x " << tree[i].bounding.maximal.x << ", y " << tree[i].bounding.maximal.y << ", z " << tree[i].bounding.maximal.z << std::endl;
-        std::cout << tree[i].child1 << ", " << tree[i].child2 << std::endl;
-        std::cout << tree[i].t1 << ", " << tree[i].t2 << std::endl;
+        //std::cout << "treenode min " << i << ": x " << tree[i].bounding.minimal.x << ", y " << tree[i].bounding.minimal.y << ", z " << tree[i].bounding.minimal.z << std::endl;
+        //std::cout << "treenode max " << i << ": x " << tree[i].bounding.maximal.x << ", y " << tree[i].bounding.maximal.y << ", z " << tree[i].bounding.maximal.z << std::endl;
+        //std::cout << tree[i].child1 << ", " << tree[i].child2 << std::endl;
+        //std::cout << tree[i].t1 << ", " << tree[i].t2 << std::endl;
 
         ((float*)tree_data)[(i * 12) + 0] = tree[i].bounding.minimal.x;
         ((float*)tree_data)[(i * 12) + 1] = tree[i].bounding.minimal.y;
@@ -317,9 +317,7 @@ void World::setTree(std::vector<Triangle> triangles) {
 }
 
 void World::buildTree(std::vector<Triangle>* triangles, std::vector<TreeNode>* tree, std::vector<Box>* boxes, int parent, bool childn) {
-    std::cout << "Starting collecting boundaries" << std::endl;
     Box bounding = boundaries(triangles);
-    std::cout << "Reaching this with " << triangles->size() << " triangles left" << std::endl;
 
     if (triangles->size() <= 2) {
         if (triangles->size() == 2) {
@@ -356,7 +354,6 @@ void World::buildTree(std::vector<Triangle>* triangles, std::vector<TreeNode>* t
 Box World::boundaries(std::vector<Triangle>* triangles) {
     Box box = Box();
 
-    std::cout << "Length of triangles: " << triangles->size() << std::endl;
     if (triangles->size() <= 0) {
         Vector3f minimal = Vector3f(0.0, 0.0, 0.0);
         Vector3f maximal = Vector3f(0.0, 0.0, 0.0);
@@ -459,8 +456,6 @@ void World::split_triangles(std::vector<Triangle>* source, std::vector<Triangle>
         av_z += z;
     }
 
-    std::cout << "Somewhere in split triangles..." << std::endl;
-
     av_x /= source->size();
     av_y /= source->size();
     av_z /= source->size();
@@ -477,16 +472,11 @@ void World::split_triangles(std::vector<Triangle>* source, std::vector<Triangle>
         stdz += sqrt((zs[i] - av_z) * (zs[i] - av_z));
     }
 
-    std::cout << "av_x, av_y, av_z: " << av_x << ", " << av_y << ", " << av_z << std::endl;
-    std::cout << "stdx, stdy, stdz: " << stdx << ", " << stdy << ", " << stdz << std::endl;
-
     bool switching = true;
 
     if (stdx >= stdy && stdx >= stdz) {
 
-        std::cout << "Should reach this" << std::endl;
         for (int i = 0; i < source->size(); i++) {
-            std::cout << "x of element " << i << ": " << xs[i] << std::endl;
             if (xs[i] > av_x) {
                 part1->push_back((*source)[i]);
             } else if (xs[i] == av_x) {
@@ -501,12 +491,8 @@ void World::split_triangles(std::vector<Triangle>* source, std::vector<Triangle>
                 part2->push_back((*source)[i]);
             }
         }
-
-        std::cout << "Splitted triangles, len of first: " << part1->size() << ", second: " << part2->size() << std::endl;
         return;
     }
-
-    std::cout << "Possibly pushed stuff from source into part1 or 2" << std::endl;
     if (stdy >= stdx && stdy >= stdz) {
         for (int i = 0; i < source->size(); i++) {
              if (ys[i] > av_y) {
@@ -523,11 +509,8 @@ void World::split_triangles(std::vector<Triangle>* source, std::vector<Triangle>
                 part2->push_back((*source)[i]);
             }
         }
-
-        std::cout << "Splitted triangles, len of first: " << part1->size() << ", second: " << part2->size() << std::endl;
         return;
     }
-    std::cout << "Possibly pushed stuff from source into part1 or 2" << std::endl;
     if (stdz >= stdz && stdz >= stdx) {
         for (int i = 0; i < source->size(); i++) {
              if (zs[i] > av_z) {
@@ -543,12 +526,8 @@ void World::split_triangles(std::vector<Triangle>* source, std::vector<Triangle>
                 part2->push_back((*source)[i]);
             }
         }
-
-        std::cout << "Splitted triangles, len of first: " << part1->size() << ", second: " << part2->size() << std::endl;
         return;
     }
-    std::cout << "Possibly pushed stuff from source into part1 or 2 last" << std::endl;
-
 }
 
 void World::trace() {

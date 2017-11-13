@@ -105,17 +105,29 @@ int main() {
 
     glfwSetKeyCallback(window, keyCallBack);
 
-    std::vector<Triangle> triangles = std::vector<Triangle>();
+
+    std::vector<Triangle> triangles = std::vector<Triangle>(1000 * 1000 * 2 + 1);
+    std::cout << 1000 * 1000 * 2 + 1 << std::endl;
+    std::cout << triangles.max_size() << std::endl;
+    for (int x = 0; x < 1000; x++) {
+        for (int y = 0; y < 1000; y++) {
+            triangles[((x) * 1000 + (y) ) * 2 + 0] = (Triangle(Vector3f((float)x - 1.0, 0.0, (float)y - 1.0), Vector3f((float)x - 1.0, 0.0,  (float)y), Vector3f((float)x, 0.0, (float)y)));
+            triangles[((x) * 1000 + (y) ) * 2 + 1] = (Triangle(Vector3f((float)x - 1.0, 0.0, (float)y - 1.0), Vector3f((float)x, 0.0,  (float)y - 1.0), Vector3f((float)x, 0.0, (float)y)));
+        }
+    }
+
+
+
 
     /*for (int i = 0; i < 50; i+= 2) {
         triangles.push_back(Triangle(Vector3f(-5.0, -1.0 * ((float)i), -5.0), Vector3f( 5.0, -1.0 * ((float)i), -5.0), Vector3f(5.0, -1.0 * ((float)i), 5.0)));
         triangles.push_back(Triangle(Vector3f(-5.0, -1.0 * ((float)i), -5.0), Vector3f(-5.0, -1.0 * ((float)i),  5.0), Vector3f(5.0, -1.0 * ((float)i), 5.0)));
     }*/
 
-    triangles.push_back(Triangle(Vector3f( -30.0, 0.0, -30.0), Vector3f(-30.0, 0.0,  30.0), Vector3f(30.0, 0.0, 30.0)));
-    triangles.push_back(Triangle(Vector3f( -30.0, 0.0, -30.0), Vector3f(30.0, 0.0,  -30.0), Vector3f(30.0, 0.0, 30.0)));
+    //triangles.push_back(Triangle(Vector3f( -30.0, 0.0, -30.0), Vector3f(-30.0, 0.0,  30.0), Vector3f(30.0, 0.0, 30.0)));
+    //triangles.push_back(Triangle(Vector3f( -30.0, 0.0, -30.0), Vector3f(30.0, 0.0,  -30.0), Vector3f(30.0, 0.0, 30.0)));
 
-    triangles.push_back(Triangle(Vector3f( -1.0, 5.0, -1.0), Vector3f(-1.0, 5.0,  1.0), Vector3f(1.0, 5.0, 1.0)));
+    triangles.push_back(Triangle(Vector3f( 7.0, 5.0, 7.0), Vector3f(7.0, 5.0,  9.0), Vector3f(9.0, 5.0, 9.0)));
 
     world.setTree(triangles);
 

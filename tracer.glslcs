@@ -47,7 +47,7 @@ layout (std430, binding = 2) buffer triangles_b
 #define MAX_LIGHTS 1
 
 const light lights[MAX_LIGHTS] = {
-  {vec3(0.0, 15.0, 0.0), 100.0}
+  {vec3(8.0, 8.0, 8.0), 20.0}
 };
 
 
@@ -118,9 +118,11 @@ bool intersectTriangles(vec3 origin, vec3 dir, in int[10] triangle_indexes, out 
   return found;
 }
 
+#define interesting_node_size 10
+
 vec4 trace_tree(vec3 origin, vec3 dir, out int[10] final_triangles) {
   int node_index = 0;
-  int interesting_nodes[10];
+  int interesting_nodes[interesting_node_size];
 
   int interesting_node_index = 0;
   int interesting_node_new_index = 0;
@@ -136,7 +138,7 @@ vec4 trace_tree(vec3 origin, vec3 dir, out int[10] final_triangles) {
     final_triangles[i] = -1;
   }
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < interesting_node_size; i++) {
     interesting_nodes[i] = -1;
     //final_triangles[i] = 3;
   }
@@ -147,20 +149,23 @@ vec4 trace_tree(vec3 origin, vec3 dir, out int[10] final_triangles) {
 
   vec2 result = intersectBox(origin, dir, (tree[0]).bounding);
   if ((result.x > 0.0 || result.y > 0.0) && result.x <= result.y) {
-    interesting_nodes[interesting_node_new_index] = 0;
+    interesting_nodes[int(mod(interesting_node_new_index, interesting_node_size))] = 0;
     interesting_node_new_index += 1;
+    interesting_nodes[int(mod(interesting_node_new_index, interesting_node_size))] = -1;
+
   }
 
-  while (interesting_nodes[interesting_node_index] != -1 && interesting_node_index < 50) {
-    treenode tree_node = tree[(interesting_nodes[interesting_node_index])];
-    int node_i = tree[interesting_nodes[interesting_node_index]].node1_i;
+  while (interesting_nodes[int(mod(interesting_node_index, interesting_node_size))] != -1) {
+    treenode tree_node = tree[(interesting_nodes[int(mod(interesting_node_index, interesting_node_size))])];
+    int node_i = tree[interesting_nodes[int(mod(interesting_node_index, interesting_node_size))]].node1_i;
 
     if (node_i != -1) {
       result = intersectBox(origin, dir, tree[node_i].bounding);
       if ((result.x > 0.0 || result.y > 0.0) && result.x <= result.y) {
           // hitted inner bounding box 1. adding to interesting list.
-          interesting_nodes[interesting_node_new_index] = node_i;
+          interesting_nodes[int(mod(interesting_node_new_index, interesting_node_size))] = node_i;
           interesting_node_new_index += 1;
+          interesting_nodes[int(mod(interesting_node_new_index, interesting_node_size))] = -1;
       }
     }
 
@@ -170,8 +175,9 @@ vec4 trace_tree(vec3 origin, vec3 dir, out int[10] final_triangles) {
       vec2 res = intersectBox(origin, dir, tree[node_i].bounding);
       if ((res.x > 0.0 || res.y > 0.0) && res.x <= res.y) {
           // hitted inner bounding box 1. adding to interesting list.
-          interesting_nodes[interesting_node_new_index] = node_i;
+          interesting_nodes[int(mod(interesting_node_new_index, interesting_node_size))] = node_i;
           interesting_node_new_index += 1;
+          interesting_nodes[int(mod(interesting_node_new_index, interesting_node_size))] = -1;
       }
     }
 
@@ -220,7 +226,7 @@ vec4 trace(vec3 origin, vec3 dir) {
 
       int[10] light_triangles;
       hitinfo j;
-      vec3 new_position = i.position - (dir * 0.001);
+      vec3 new_position = i.position - (dir * 0.00001);
       vec4 debugColor = trace_tree(new_position, lights[k].position - new_position, light_triangles);
       if (intersectTriangles(new_position, lights[k].position - new_position, light_triangles, j)) {
         if (j.distance < length(lights[k].position - new_position)) {
