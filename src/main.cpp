@@ -6,6 +6,7 @@
 #include <iostream>
 #include <World.h>
 #include <math.h>
+#include <time.h>
 
 
 float horizontal_direction = 0;
@@ -111,27 +112,33 @@ int main() {
     std::cout << triangles.max_size() << std::endl;
     for (int x = 0; x < 1000; x++) {
         for (int y = 0; y < 1000; y++) {
-            triangles[((x) * 1000 + (y) ) * 2 + 0] = (Triangle(Vector3f((float)x - 1.0, 0.0, (float)y - 1.0), Vector3f((float)x - 1.0, 0.0,  (float)y), Vector3f((float)x, 0.0, (float)y)));
-            triangles[((x) * 1000 + (y) ) * 2 + 1] = (Triangle(Vector3f((float)x - 1.0, 0.0, (float)y - 1.0), Vector3f((float)x, 0.0,  (float)y - 1.0), Vector3f((float)x, 0.0, (float)y)));
+            Triangle tr;
+            tr.a = Vector3f((float)x - 1.0, 0.0, (float)y - 1.0);
+            tr.b = Vector3f((float)x - 1.0, 0.0,  (float)y);
+            tr.c = Vector3f((float)x, 0.0, (float)y);
+            triangles[((x) * 1000 + (y) ) * 2 + 0] = tr;
+
+            tr.a = Vector3f((float)x - 1.0, 0.0, (float)y - 1.0);
+            tr.b = Vector3f((float)x, 0.0,  (float)y - 1.0);
+            tr.c = Vector3f((float)x, 0.0, (float)y);
+            triangles[((x) * 1000 + (y) ) * 2 + 1] = tr;
         }
     }
 
-
-
-
-    /*for (int i = 0; i < 50; i+= 2) {
-        triangles.push_back(Triangle(Vector3f(-5.0, -1.0 * ((float)i), -5.0), Vector3f( 5.0, -1.0 * ((float)i), -5.0), Vector3f(5.0, -1.0 * ((float)i), 5.0)));
-        triangles.push_back(Triangle(Vector3f(-5.0, -1.0 * ((float)i), -5.0), Vector3f(-5.0, -1.0 * ((float)i),  5.0), Vector3f(5.0, -1.0 * ((float)i), 5.0)));
-    }*/
-
-    //triangles.push_back(Triangle(Vector3f( -30.0, 0.0, -30.0), Vector3f(-30.0, 0.0,  30.0), Vector3f(30.0, 0.0, 30.0)));
-    //triangles.push_back(Triangle(Vector3f( -30.0, 0.0, -30.0), Vector3f(30.0, 0.0,  -30.0), Vector3f(30.0, 0.0, 30.0)));
-
-    triangles.push_back(Triangle(Vector3f( 7.0, 5.0, 7.0), Vector3f(7.0, 5.0,  9.0), Vector3f(9.0, 5.0, 9.0)));
-
     world.setTree(triangles);
+    int frame_count = 0;
+    double timer;
+
 
     while (!glfwWindowShouldClose(window)) {
+        frame_count += 1;
+        if (time(NULL) > timer + 1) {
+            timer = time(NULL);
+            std::cout << frame_count << std::endl;
+            frame_count = 0;
+        }
+
+
         handleKeys();
         glfwPollEvents();
         glViewport(0, 0, world.width, world.height);
@@ -142,7 +149,6 @@ int main() {
         world.view.setVerticalDirection(vertical_direction);
         world.view.setPosition(position);
         world.view.process();
-
     }
     // close GL context and any other GLFW resources
     GLuint shader = glCreateShader(GL_VERTEX_SHADER);

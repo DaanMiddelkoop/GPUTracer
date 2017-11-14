@@ -15,8 +15,8 @@ class Vector3f
         float length();
 
         float x, y, z;
-        float len;
-        bool refreshLength;
+        //float len;
+        //bool refreshLength;
 
     protected:
 

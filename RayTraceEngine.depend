@@ -105,3 +105,86 @@
 1510488893 source:c:\projects\raytraceengine\src\treenode.cpp
 	"TreeNode.h"
 
+1510607731 source:c:\projects\gputracer\src\main.cpp
+	<windows.h>
+	<GL/glew.h>
+	<GLFW/glfw3.h>
+	<stdio.h>
+	<iostream>
+	<World.h>
+	<math.h>
+	<time.h>
+
+1510593295 c:\projects\gputracer\include\world.h
+	<GL/glew.h>
+	<GLFW/glfw3.h>
+	<string>
+	<fstream>
+	<iostream>
+	<vector>
+	<Camera.h>
+	<View.h>
+	<Triangle.h>
+	<Box.h>
+	<TreeNode.h>
+	<Math.h>
+
+1510593295 c:\projects\gputracer\include\camera.h
+	<Matrix4f.h>
+	<Vector3f.h>
+	<Vector4f.h>
+
+1510593295 c:\projects\gputracer\include\matrix4f.h
+
+1510598411 c:\projects\gputracer\include\vector3f.h
+
+1510593295 c:\projects\gputracer\include\vector4f.h
+
+1510593295 c:\projects\gputracer\include\view.h
+	<Vector3f.h>
+
+1510599017 c:\projects\gputracer\include\triangle.h
+	<Vector3f.h>
+
+1510593295 c:\projects\gputracer\include\box.h
+	<Vector3f.h>
+
+1510593295 c:\projects\gputracer\include\treenode.h
+	<Box.h>
+
+1510598486 source:c:\projects\gputracer\src\vector3f.cpp
+	"Vector3f.h"
+	<math.h>
+
+1510593295 source:c:\projects\gputracer\src\vector4f.cpp
+	"Vector4f.h"
+
+1510593295 source:c:\projects\gputracer\src\view.cpp
+	"View.h"
+	<math.h>
+
+1510655646 source:c:\projects\gputracer\src\world.cpp
+	"World.h"
+	<String.h>
+	<stdlib.h>
+
+1510593295 source:c:\projects\gputracer\src\box.cpp
+	"Box.h"
+
+1510593295 source:c:\projects\gputracer\src\camera.cpp
+	"Camera.h"
+
+1510593295 source:c:\projects\gputracer\src\matrix4f.cpp
+	"Matrix4f.h"
+
+1510593295 source:c:\projects\gputracer\src\treenode.cpp
+	"TreeNode.h"
+
+1510597781 source:c:\projects\gputracer\src\triangle.cpp
+	"Triangle.h"
+
+1510597093 source:c:\projects\gputracer\src\modelloader.cpp
+	"ModelLoader.h"
+
+1510597093 c:\projects\gputracer\include\modelloader.h
+

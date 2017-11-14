@@ -6,7 +6,6 @@ Vector3f::Vector3f(float x, float y, float z)
     this->x = x;
     this->y = y;
     this->z = z;
-    refreshLength = true;
 }
 
 bool Vector3f::equals(Vector3f other) {
@@ -17,7 +16,6 @@ void Vector3f::set(Vector3f other) {
     this->x = other.x;
     this->y = other.y;
     this->z = other.z;
-    refreshLength = true;
 }
 
 Vector3f Vector3f::cross(Vector3f other) {
@@ -25,15 +23,11 @@ Vector3f Vector3f::cross(Vector3f other) {
 }
 
 float Vector3f::length() {
-    if (refreshLength) {
-        len = sqrt(x * x + y * y + z * z);
-    }
-    return len;
+    return sqrt(x * x + y * y + z * z);
 }
 
 void Vector3f::normalize() {
     x = x / length();
     y = y / length();
     z = z / length();
-    len = 1.0f;
 }

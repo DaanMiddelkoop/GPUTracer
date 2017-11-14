@@ -9,6 +9,8 @@ struct triangle {
   vec3 a;
   vec3 b;
   vec3 c;
+  int index;
+  int mat;
 };
 
 struct treenode {
@@ -145,6 +147,7 @@ vec4 trace_tree(vec3 origin, vec3 dir, out int[10] final_triangles) {
 
 
 
+
   
 
   vec2 result = intersectBox(origin, dir, (tree[0]).bounding);
@@ -156,6 +159,8 @@ vec4 trace_tree(vec3 origin, vec3 dir, out int[10] final_triangles) {
   }
 
   while (interesting_nodes[int(mod(interesting_node_index, interesting_node_size))] != -1) {
+    outDebugColor[1] = 1.0;
+
     treenode tree_node = tree[(interesting_nodes[int(mod(interesting_node_index, interesting_node_size))])];
     int node_i = tree[interesting_nodes[int(mod(interesting_node_index, interesting_node_size))]].node1_i;
 
@@ -199,18 +204,12 @@ vec4 trace_tree(vec3 origin, vec3 dir, out int[10] final_triangles) {
     interesting_node_index += 1;
   }
 
-  if (triangle_node_index > 0) {
+  if (interesting_node_new_index > 0) {
     outDebugColor[0] = 1.0;
   } else {
     //outDebugColor[1] = 0.5;
   }
-
-  
-
-  
-
   return outDebugColor;
-
 }
 
 vec4 trace(vec3 origin, vec3 dir) {

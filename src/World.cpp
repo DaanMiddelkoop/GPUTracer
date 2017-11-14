@@ -208,6 +208,8 @@ int World::createFramebufferTexture()
     return tex;
 }
 
+
+
 void World::setTree(std::vector<Triangle> triangles) {
     std::vector<TreeNode> tree;
     std::vector<Box> boxes;
@@ -256,6 +258,11 @@ void World::setTree(std::vector<Triangle> triangles) {
         ((int*)tree_data)[(i * 12) + 10] = tree[i].t1;
         ((int*)tree_data)[(i * 12) + 11] = tree[i].t2;
     }
+
+    for (int i = 0; i < 10; i++) {
+        std::cout << ((float*)tree_data)[i] << std::endl;
+    }
+
     GLuint ssbo = 0;
     glGenBuffers(1, &ssbo);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
@@ -273,35 +280,25 @@ void World::setTree(std::vector<Triangle> triangles) {
     GLuint ssbo_binding_point_index = 1;
     glShaderStorageBlockBinding(computeProgram, block_index, ssbo_binding_point_index);
 
-    glShaderStorageBlockBinding(computeProgram, block_index, 60);
-    GLuint binding_point_index = 60;
+    glShaderStorageBlockBinding(computeProgram, block_index, 10);
+    GLuint binding_point_index = 10;
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point_index, ssbo);
 
-    float* triangle_data = new float[triangles.size() * 12];
+    Triangle* triangle_data = &triangles[0];
 
-    for (int i = 0; i < triangles.size(); i++) {
-        triangle_data[(i * 12) + 0] = triangles[i].a.x;
-        triangle_data[(i * 12) + 1] = triangles[i].a.y;
-        triangle_data[(i * 12) + 2] = triangles[i].a.z;
-
-        triangle_data[(i * 12) + 4] = triangles[i].b.x;
-        triangle_data[(i * 12) + 5] = triangles[i].b.y;
-        triangle_data[(i * 12) + 6] = triangles[i].b.z;
-
-        triangle_data[(i * 12) + 8] = triangles[i].c.x;
-        triangle_data[(i * 12) + 9] = triangles[i].c.y;
-        triangle_data[(i * 12) + 10] = triangles[i].c.z;
+    for (int i = 0; i < 30; i++) {
+        std::cout << "but is" << ((float*)triangle_data)[i] << std::endl;
     }
 
     ssbo = 0;
     glGenBuffers(1, &ssbo);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * triangles.size() * 12, triangle_data, GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Triangle) * triangles.size(), triangle_data, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
     p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p, triangle_data, sizeof(float) * triangles.size() * 12);
+    memcpy(p, triangle_data, sizeof(Triangle) * triangles.size());
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
     block_index = 0;
@@ -310,8 +307,9 @@ void World::setTree(std::vector<Triangle> triangles) {
     ssbo_binding_point_index = 2;
     glShaderStorageBlockBinding(computeProgram, block_index, ssbo_binding_point_index);
 
-    glShaderStorageBlockBinding(computeProgram, block_index, 80);
-    binding_point_index = 80;
+
+    glShaderStorageBlockBinding(computeProgram, block_index, 11);
+    binding_point_index = 11;
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point_index, ssbo);
 
 }

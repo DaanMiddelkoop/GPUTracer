@@ -3,19 +3,18 @@
 
 #include <Vector3f.h>
 
-class Triangle
+struct Triangle
 {
-    public:
-        Triangle();
-        Triangle(Vector3f a, Vector3f b, Vector3f c);
-        Vector3f a;
-        Vector3f b;
-        Vector3f c;
-        int index;
-
-    protected:
-
-    private:
+    Vector3f a;
+    float nop1;
+    Vector3f b;
+    float nop2;
+    Vector3f c;
+    int index;
+    int mat;
+    int mat2;
+    int mat3;
+    int mat4;
 };
 
 #endif // TRIANGLE_H
