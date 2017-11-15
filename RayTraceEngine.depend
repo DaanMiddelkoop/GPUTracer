@@ -1,10 +1,10 @@
 # depslib dependency file v1.0
-1510744833 source:c:\projects\raytraceengine\src\world.cpp
+1510748730 source:c:\projects\raytraceengine\src\world.cpp
 	"World.h"
 	<String.h>
 	<stdlib.h>
 
-1510742834 c:\projects\raytraceengine\include\world.h
+1510748143 c:\projects\raytraceengine\include\world.h
 	<GL/glew.h>
 	<GLFW/glfw3.h>
 	<string>
@@ -18,7 +18,7 @@
 	<TreeNode.h>
 	<Math.h>
 
-1510745350 source:c:\projects\raytraceengine\src\main.cpp
+1510748688 source:c:\projects\raytraceengine\src\main.cpp
 	<windows.h>
 	<GL/glew.h>
 	<GLFW/glfw3.h>

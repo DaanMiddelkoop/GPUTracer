@@ -114,23 +114,23 @@ int main() {
     glfwSetKeyCallback(window, keyCallBack);
 
 
-    std::vector<Triangle*> triangles = std::vector<Triangle*>(100 * 100 * 1);
-    std::cout << 100 * 100 * 2 + 1 << std::endl;
+    std::vector<Triangle*> triangles = std::vector<Triangle*>(1000 * 1000 * 2);
+    std::cout << 1000 * 1000 * 2 + 1 << std::endl;
     std::cout << triangles.max_size() << std::endl;
-    for (int x = 0; x < 100; x++) {
-        for (int y = 0; y < 100; y++) {
+    for (int x = 0; x < 1000; x++) {
+        for (int y = 0; y < 1000; y++) {
             Triangle* tr = new Triangle();
             tr->a = Vector3f((float)x - 1.0, -abs(sin(x / 10.0)*5) , (float)y - 1.0);
             tr->b = Vector3f((float)x - 1.0, -abs(sin(x / 10.0)*5) ,  (float)y);
             tr->c = Vector3f((float)x, -abs(sin(x / 10.0)*5) , (float)y);
-            triangles[((x) * 100 + (y) ) * 1 + 0] = tr;
+            triangles[((x) * 1000 + (y) ) * 2 + 0] = tr;
 
 
             tr = new Triangle();
             tr->a = Vector3f((float)x - 1.0, -abs(sin(x / 10.0)*5) , (float)y - 1.0);
             tr->b = Vector3f((float)x, -abs(sin(x / 10.0)*5) ,  (float)y - 1.0);
             tr->c = Vector3f((float)x, -abs(sin(x / 10.0)*5) , (float)y);
-            //triangles[((x) * 100 + (y) ) * 2 + 1] = tr;
+            triangles[((x) * 1000 + (y) ) * 2 + 1] = tr;
         }
     }
 

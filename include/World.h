@@ -45,7 +45,7 @@ class World
 
         void buildTree(std::vector<Triangle*>* triangles, std::vector<TreeNode*>* tree, int parent, bool childn);
         Box boundaries(std::vector<Triangle*>* triangles);
-        void split_triangles(std::vector<Triangle*>* source, std::vector<Triangle*>* part1, std::vector<Triangle*>* part2, Box bounding);
+        void split_triangles(std::vector<Triangle*>* source, std::vector<Triangle*>* part1, std::vector<Triangle*>* part2);
 
 
 

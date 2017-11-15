@@ -219,14 +219,14 @@ void World::setTree(std::vector<Triangle*> triangles) {
 
 
     Box bounding = boundaries(&triangles);
-    tree.push_back(new TreeNode(bounding, -1, -1, -1, -1, -1));
+    tree.push_back(new TreeNode(bounding, -1, -1, -1, -1, 1));
     int node_index = tree.size() - 1;
 
     std::cout << "reaching this? abc" << std::endl;
 
     std::vector<Triangle*> triangles1;
     std::vector<Triangle*> triangles2;
-    split_triangles(&triangles, &triangles1, &triangles2, bounding);
+    split_triangles(&triangles, &triangles1, &triangles2);
     std::cout << "Starting tree, amount of triangles: " << triangles.size() << std::endl;
     std::cout << "Start tree branches, length of first: " << triangles1.size() << ", second: " << triangles2.size() << std::endl;
 
@@ -235,16 +235,12 @@ void World::setTree(std::vector<Triangle*> triangles) {
     buildTree(&triangles2, &tree, node_index, true);
     std::cout << "Finished building tree." << std::endl;
 
-
-
-    std::cout << "YOU FUCKING WHOT MATE?" << std::endl;
-
     int max_depth = -1;
 
     void* tree_data = malloc(sizeof(float) * tree.size() * 12);
     for (int i = 0; i < tree.size(); i++) {
-        //std::cout << "treenode min " << i << ": x " << tree[i].bounding.minimal.x << ", y " << tree[i].bounding.minimal.y << ", z " << tree[i].bounding.minimal.z << std::endl;
-        //std::cout << "treenode max " << i << ": x " << tree[i].bounding.maximal.x << ", y " << tree[i].bounding.maximal.y << ", z " << tree[i].bounding.maximal.z << std::endl;
+        //std::cout << "treenode min " << i << ": x " << tree[i]->bounding.minimal.x << ", y " << tree[i]->bounding.minimal.y << ", z " << tree[i]->bounding.minimal.z << std::endl;
+        //std::cout << "treenode max " << i << ": x " << tree[i]->bounding.maximal.x << ", y " << tree[i]->bounding.maximal.y << ", z " << tree[i]->bounding.maximal.z << std::endl;
         //std::cout << tree[i].child1 << ", " << tree[i].child2 << std::endl;
         //std::cout << tree[i].t1 << ", " << tree[i].t2 << std::endl;
         //std::cout << "depth of " << i << ": " << tree[i]->depth << std::endl;
@@ -352,7 +348,7 @@ void World::buildTree(std::vector<Triangle*>* triangles, std::vector<TreeNode*>*
 
     std::vector<Triangle*> triangles1;
     std::vector<Triangle*> triangles2;
-    split_triangles(triangles, &triangles1, &triangles2, bounding);
+    split_triangles(triangles, &triangles1, &triangles2);
     buildTree(&triangles1, tree, node_index, false);
     buildTree(&triangles2, tree, node_index, true);
 }
@@ -416,7 +412,7 @@ Box World::boundaries(std::vector<Triangle*>* triangles) {
         if (triangle->b.x > maximal.x) {
             maximal.x = triangle->b.x;
         }
-        if (triangle->b.y > minimal.y) {
+        if (triangle->b.y > maximal.y) {
             maximal.y = triangle->b.y;
         }
         if (triangle->b.z > maximal.z) {
@@ -438,7 +434,7 @@ Box World::boundaries(std::vector<Triangle*>* triangles) {
     return box;
 }
 
-void World::split_triangles(std::vector<Triangle*>* source, std::vector<Triangle*>* part1, std::vector<Triangle*>* part2, Box bounding) {
+void World::split_triangles(std::vector<Triangle*>* source, std::vector<Triangle*>* part1, std::vector<Triangle*>* part2) {
     float av_x = 0.0f;
     float av_y = 0.0f;
     float av_z = 0.0f;
