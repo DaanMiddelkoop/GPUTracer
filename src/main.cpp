@@ -59,6 +59,13 @@ void handleKeys() {
         position.x -= sin(horizontal_direction) * 0.1;
         position.z += cos(horizontal_direction) * 0.1;
     }
+
+    if (keys[GLFW_KEY_M]) {
+        position.y += 0.1;
+    }
+    if (keys[GLFW_KEY_N]) {
+        position.y -= 0.1;
+    }
 }
 
 int main() {
@@ -113,14 +120,14 @@ int main() {
     for (int x = 0; x < 1000; x++) {
         for (int y = 0; y < 1000; y++) {
             Triangle tr;
-            tr.a = Vector3f((float)x - 1.0, 0.0, (float)y - 1.0);
-            tr.b = Vector3f((float)x - 1.0, 0.0,  (float)y);
-            tr.c = Vector3f((float)x, 0.0, (float)y);
+            tr.a = Vector3f((float)x - 1.0, -abs(sin(x / 10.0)*5) , (float)y - 1.0);
+            tr.b = Vector3f((float)x - 1.0, -abs(sin(x / 10.0)*5) ,  (float)y);
+            tr.c = Vector3f((float)x, -abs(sin(x / 10.0)*5) , (float)y);
             triangles[((x) * 1000 + (y) ) * 2 + 0] = tr;
 
-            tr.a = Vector3f((float)x - 1.0, 0.0, (float)y - 1.0);
-            tr.b = Vector3f((float)x, 0.0,  (float)y - 1.0);
-            tr.c = Vector3f((float)x, 0.0, (float)y);
+            tr.a = Vector3f((float)x - 1.0, -abs(sin(x / 10.0)*5) , (float)y - 1.0);
+            tr.b = Vector3f((float)x, -abs(sin(x / 10.0)*5) ,  (float)y  -1.0);
+            tr.c = Vector3f((float)x, -abs(sin(x / 10.0)*5) , (float)y);
             triangles[((x) * 1000 + (y) ) * 2 + 1] = tr;
         }
     }

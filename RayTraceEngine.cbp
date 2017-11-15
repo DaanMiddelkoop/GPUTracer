@@ -44,11 +44,18 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="include/Matrix4f.h" />
+		<Unit filename="include/Box.h" />
+		<Unit filename="include/ModelLoader.h" />
+		<Unit filename="include/TreeNode.h" />
+		<Unit filename="include/Triangle.h" />
 		<Unit filename="include/Vector3f.h" />
 		<Unit filename="include/Vector4f.h" />
 		<Unit filename="include/View.h" />
 		<Unit filename="include/World.h" />
+		<Unit filename="src/Box.cpp" />
+		<Unit filename="src/ModelLoader.cpp" />
+		<Unit filename="src/TreeNode.cpp" />
+		<Unit filename="src/Triangle.cpp" />
 		<Unit filename="src/Vector3f.cpp" />
 		<Unit filename="src/Vector4f.cpp" />
 		<Unit filename="src/View.cpp" />

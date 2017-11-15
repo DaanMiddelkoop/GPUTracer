@@ -6,12 +6,13 @@
 class TreeNode
 {
     public:
-        TreeNode(Box bounding, int child1, int child2, int t1, int t2);
+        TreeNode(Box bounding, int child1, int child2, int t1, int t2, int depth);
         Box bounding;
         int child1;
         int child2;
         int t1;
         int t2;
+        int depth = 0;
 
     protected:
 

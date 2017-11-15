@@ -220,7 +220,7 @@ void World::setTree(std::vector<Triangle> triangles) {
 
 
     Box bounding = boundaries(&triangles);
-    tree.push_back(TreeNode(bounding, -1, -1, -1, -1));
+    tree.push_back(TreeNode(bounding, -1, -1, -1, -1, -1));
     int node_index = tree.size() - 1;
 
     std::cout << "reaching this? abc" << std::endl;
@@ -238,12 +238,20 @@ void World::setTree(std::vector<Triangle> triangles) {
 
 
 
+    std::cout << "YOU FUCKING WHOT MATE?" << std::endl;
+
+    int max_depth = -1;
+
     void* tree_data = malloc(sizeof(float) * tree.size() * 12);
     for (int i = 0; i < tree.size(); i++) {
         //std::cout << "treenode min " << i << ": x " << tree[i].bounding.minimal.x << ", y " << tree[i].bounding.minimal.y << ", z " << tree[i].bounding.minimal.z << std::endl;
         //std::cout << "treenode max " << i << ": x " << tree[i].bounding.maximal.x << ", y " << tree[i].bounding.maximal.y << ", z " << tree[i].bounding.maximal.z << std::endl;
         //std::cout << tree[i].child1 << ", " << tree[i].child2 << std::endl;
         //std::cout << tree[i].t1 << ", " << tree[i].t2 << std::endl;
+        //std::cout << "depth of " << i << ": " << tree[i].depth << std::endl;
+        if (max_depth < tree[i].depth) {
+            max_depth = tree[i].depth;
+        }
 
         ((float*)tree_data)[(i * 12) + 0] = tree[i].bounding.minimal.x;
         ((float*)tree_data)[(i * 12) + 1] = tree[i].bounding.minimal.y;
@@ -259,9 +267,7 @@ void World::setTree(std::vector<Triangle> triangles) {
         ((int*)tree_data)[(i * 12) + 11] = tree[i].t2;
     }
 
-    for (int i = 0; i < 10; i++) {
-        std::cout << ((float*)tree_data)[i] << std::endl;
-    }
+    std::cout << "MAX DEPTH: " << max_depth << ", " << tree.size() << std::endl;
 
     GLuint ssbo = 0;
     glGenBuffers(1, &ssbo);
@@ -319,9 +325,9 @@ void World::buildTree(std::vector<Triangle>* triangles, std::vector<TreeNode>* t
 
     if (triangles->size() <= 2) {
         if (triangles->size() == 2) {
-            tree->push_back(TreeNode(bounding, -1, -1, (*triangles)[0].index, (*triangles)[1].index));
+            tree->push_back(TreeNode(bounding, -1, -1, (*triangles)[0].index, (*triangles)[1].index, -1));
         } else {
-            tree->push_back(TreeNode(bounding, -1, -1, (*triangles)[0].index, -1));
+            tree->push_back(TreeNode(bounding, -1, -1, (*triangles)[0].index, -1, -1));
         }
 
         if (childn == false) {
@@ -333,7 +339,7 @@ void World::buildTree(std::vector<Triangle>* triangles, std::vector<TreeNode>* t
     }
 
 
-    tree->push_back(TreeNode(bounding, -1, -1, -1, -1));
+    tree->push_back(TreeNode(bounding, -1, -1, -1, -1, (*tree)[parent].depth + 1));
     int node_index = tree->size() - 1;
 
     if (childn == false) {

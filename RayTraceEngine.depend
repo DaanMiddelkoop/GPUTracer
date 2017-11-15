@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1510531235 source:c:\projects\raytraceengine\src\world.cpp
+1510668520 source:c:\projects\raytraceengine\src\world.cpp
 	"World.h"
 	<String.h>
 	<stdlib.h>
@@ -18,7 +18,7 @@
 	<TreeNode.h>
 	<Math.h>
 
-1510533277 source:c:\projects\raytraceengine\src\main.cpp
+1510672115 source:c:\projects\raytraceengine\src\main.cpp
 	<windows.h>
 	<GL/glew.h>
 	<GLFW/glfw3.h>
@@ -26,6 +26,7 @@
 	<iostream>
 	<World.h>
 	<math.h>
+	<time.h>
 
 1374502282 c:\libraries\glew-2.1.0\include\gl\glew.h
 	<stddef.h>
@@ -66,14 +67,14 @@
 
 1510425422 c:\projects\raytraceengine\include\matrix4f.h
 
-1510436313 c:\projects\raytraceengine\include\vector3f.h
+1510668520 c:\projects\raytraceengine\include\vector3f.h
 
 1510423346 c:\projects\raytraceengine\include\vector4f.h
 
 1510423061 source:c:\projects\raytraceengine\src\matrix4f.cpp
 	"Matrix4f.h"
 
-1510436339 source:c:\projects\raytraceengine\src\vector3f.cpp
+1510668520 source:c:\projects\raytraceengine\src\vector3f.cpp
 	"Vector3f.h"
 	<math.h>
 
@@ -93,16 +94,16 @@
 1510488621 c:\projects\raytraceengine\include\box.h
 	<Vector3f.h>
 
-1510532585 c:\projects\raytraceengine\include\triangle.h
+1510668520 c:\projects\raytraceengine\include\triangle.h
 	<Vector3f.h>
 
-1510532602 source:c:\projects\raytraceengine\src\triangle.cpp
+1510668520 source:c:\projects\raytraceengine\src\triangle.cpp
 	"Triangle.h"
 
-1510488914 c:\projects\raytraceengine\include\treenode.h
+1510674315 c:\projects\raytraceengine\include\treenode.h
 	<Box.h>
 
-1510488893 source:c:\projects\raytraceengine\src\treenode.cpp
+1510674341 source:c:\projects\raytraceengine\src\treenode.cpp
 	"TreeNode.h"
 
 1510607731 source:c:\projects\gputracer\src\main.cpp
@@ -187,4 +188,9 @@
 	"ModelLoader.h"
 
 1510597093 c:\projects\gputracer\include\modelloader.h
+
+1510668520 source:c:\projects\raytraceengine\src\modelloader.cpp
+	"ModelLoader.h"
+
+1510668520 c:\projects\raytraceengine\include\modelloader.h
 
