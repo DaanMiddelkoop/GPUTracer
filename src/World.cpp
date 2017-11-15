@@ -210,30 +210,29 @@ int World::createFramebufferTexture()
 
 
 
-void World::setTree(std::vector<Triangle> triangles) {
-    std::vector<TreeNode> tree;
-    std::vector<Box> boxes;
+void World::setTree(std::vector<Triangle*> triangles) {
+    std::vector<TreeNode*> tree;
 
     for (int i = 0; i < triangles.size(); i++) {
-        triangles[i].index = i;
+        triangles[i]->index = i;
     }
 
 
     Box bounding = boundaries(&triangles);
-    tree.push_back(TreeNode(bounding, -1, -1, -1, -1, -1));
+    tree.push_back(new TreeNode(bounding, -1, -1, -1, -1, -1));
     int node_index = tree.size() - 1;
 
     std::cout << "reaching this? abc" << std::endl;
 
-    std::vector<Triangle> triangles1;
-    std::vector<Triangle> triangles2;
+    std::vector<Triangle*> triangles1;
+    std::vector<Triangle*> triangles2;
     split_triangles(&triangles, &triangles1, &triangles2, bounding);
     std::cout << "Starting tree, amount of triangles: " << triangles.size() << std::endl;
     std::cout << "Start tree branches, length of first: " << triangles1.size() << ", second: " << triangles2.size() << std::endl;
 
-    buildTree(&triangles1, &tree, &boxes, node_index, false);
+    buildTree(&triangles1, &tree, node_index, false);
     std::cout << "Finished building half the tree." << std::endl;
-    buildTree(&triangles2, &tree, &boxes, node_index, true);
+    buildTree(&triangles2, &tree, node_index, true);
     std::cout << "Finished building tree." << std::endl;
 
 
@@ -248,23 +247,23 @@ void World::setTree(std::vector<Triangle> triangles) {
         //std::cout << "treenode max " << i << ": x " << tree[i].bounding.maximal.x << ", y " << tree[i].bounding.maximal.y << ", z " << tree[i].bounding.maximal.z << std::endl;
         //std::cout << tree[i].child1 << ", " << tree[i].child2 << std::endl;
         //std::cout << tree[i].t1 << ", " << tree[i].t2 << std::endl;
-        //std::cout << "depth of " << i << ": " << tree[i].depth << std::endl;
-        if (max_depth < tree[i].depth) {
-            max_depth = tree[i].depth;
+        //std::cout << "depth of " << i << ": " << tree[i]->depth << std::endl;
+        if (max_depth < tree[i]->depth) {
+            max_depth = tree[i]->depth;
         }
 
-        ((float*)tree_data)[(i * 12) + 0] = tree[i].bounding.minimal.x;
-        ((float*)tree_data)[(i * 12) + 1] = tree[i].bounding.minimal.y;
-        ((float*)tree_data)[(i * 12) + 2] = tree[i].bounding.minimal.z;
+        ((float*)tree_data)[(i * 12) + 0] = tree[i]->bounding.minimal.x;
+        ((float*)tree_data)[(i * 12) + 1] = tree[i]->bounding.minimal.y;
+        ((float*)tree_data)[(i * 12) + 2] = tree[i]->bounding.minimal.z;
 
-        ((float*)tree_data)[(i * 12) + 4] = tree[i].bounding.maximal.x;
-        ((float*)tree_data)[(i * 12) + 5] = tree[i].bounding.maximal.y;
-        ((float*)tree_data)[(i * 12) + 6] = tree[i].bounding.maximal.z;
+        ((float*)tree_data)[(i * 12) + 4] = tree[i]->bounding.maximal.x;
+        ((float*)tree_data)[(i * 12) + 5] = tree[i]->bounding.maximal.y;
+        ((float*)tree_data)[(i * 12) + 6] = tree[i]->bounding.maximal.z;
 
-        ((int*)tree_data)[(i * 12) + 8] = tree[i].child1;
-        ((int*)tree_data)[(i * 12) + 9] = tree[i].child2;
-        ((int*)tree_data)[(i * 12) + 10] = tree[i].t1;
-        ((int*)tree_data)[(i * 12) + 11] = tree[i].t2;
+        ((int*)tree_data)[(i * 12) + 8] = tree[i]->child1;
+        ((int*)tree_data)[(i * 12) + 9] = tree[i]->child2;
+        ((int*)tree_data)[(i * 12) + 10] = tree[i]->t1;
+        ((int*)tree_data)[(i * 12) + 11] = tree[i]->t2;
     }
 
     std::cout << "MAX DEPTH: " << max_depth << ", " << tree.size() << std::endl;
@@ -290,21 +289,24 @@ void World::setTree(std::vector<Triangle> triangles) {
     GLuint binding_point_index = 10;
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point_index, ssbo);
 
-    Triangle* triangle_data = &triangles[0];
 
-    for (int i = 0; i < 30; i++) {
-        std::cout << "but is" << ((float*)triangle_data)[i] << std::endl;
-    }
+
+
 
     ssbo = 0;
     glGenBuffers(1, &ssbo);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Triangle) * triangles.size(), triangle_data, GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Triangle) * triangles.size(), NULL, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
     p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p, triangle_data, sizeof(Triangle) * triangles.size());
+
+    for (int i = 0; i < triangles.size(); i++) {
+        memcpy(p + (sizeof(Triangle) * i), triangles[i], sizeof(Triangle));
+    }
+
+    //memcpy(p, triangle_data, sizeof(Triangle) * triangles.size());
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
     block_index = 0;
@@ -320,42 +322,42 @@ void World::setTree(std::vector<Triangle> triangles) {
 
 }
 
-void World::buildTree(std::vector<Triangle>* triangles, std::vector<TreeNode>* tree, std::vector<Box>* boxes, int parent, bool childn) {
+void World::buildTree(std::vector<Triangle*>* triangles, std::vector<TreeNode*>* tree, int parent, bool childn) {
     Box bounding = boundaries(triangles);
 
     if (triangles->size() <= 2) {
         if (triangles->size() == 2) {
-            tree->push_back(TreeNode(bounding, -1, -1, (*triangles)[0].index, (*triangles)[1].index, -1));
+            tree->push_back(new TreeNode(bounding, -1, -1, (*triangles)[0]->index, (*triangles)[1]->index, (*tree)[parent]->depth + 1));
         } else {
-            tree->push_back(TreeNode(bounding, -1, -1, (*triangles)[0].index, -1, -1));
+            tree->push_back(new TreeNode(bounding, -1, -1, (*triangles)[0]->index, -1, (*tree)[parent]->depth + 1));
         }
 
         if (childn == false) {
-            (*tree)[parent].child1 = tree->size() - 1;
+            (*tree)[parent]->child1 = tree->size() - 1;
         } else {
-            (*tree)[parent].child2 = tree->size() - 1;
+            (*tree)[parent]->child2 = tree->size() - 1;
         }
         return;
     }
 
 
-    tree->push_back(TreeNode(bounding, -1, -1, -1, -1, (*tree)[parent].depth + 1));
+    tree->push_back(new TreeNode(bounding, -1, -1, -1, -1, (*tree)[parent]->depth + 1));
     int node_index = tree->size() - 1;
 
     if (childn == false) {
-        (*tree)[parent].child1 = node_index;
+        (*tree)[parent]->child1 = node_index;
     } else {
-        (*tree)[parent].child2 = node_index;
+        (*tree)[parent]->child2 = node_index;
     }
 
-    std::vector<Triangle> triangles1;
-    std::vector<Triangle> triangles2;
+    std::vector<Triangle*> triangles1;
+    std::vector<Triangle*> triangles2;
     split_triangles(triangles, &triangles1, &triangles2, bounding);
-    buildTree(&triangles1, tree, boxes, node_index, false);
-    buildTree(&triangles2, tree, boxes, node_index, true);
+    buildTree(&triangles1, tree, node_index, false);
+    buildTree(&triangles2, tree, node_index, true);
 }
 
-Box World::boundaries(std::vector<Triangle>* triangles) {
+Box World::boundaries(std::vector<Triangle*>* triangles) {
     Box box = Box();
 
     if (triangles->size() <= 0) {
@@ -366,11 +368,11 @@ Box World::boundaries(std::vector<Triangle>* triangles) {
         return box;
     }
 
-    Vector3f minimal((*triangles)[0].a.x, (*triangles)[0].a.y, (*triangles)[0].a.z);
-    Vector3f maximal((*triangles)[0].a.x, (*triangles)[0].a.y, (*triangles)[0].a.z);
+    Vector3f minimal((*triangles)[0]->a.x, (*triangles)[0]->a.y, (*triangles)[0]->a.z);
+    Vector3f maximal((*triangles)[0]->a.x, (*triangles)[0]->a.y, (*triangles)[0]->a.z);
 
     for (int i = 0; i < triangles->size(); i++) {
-        Triangle* triangle = &(*triangles)[i];
+        Triangle* triangle = (*triangles)[i];
         if (triangle->a.x < minimal.x) {
             minimal.x = triangle->a.x;
         }
@@ -436,7 +438,7 @@ Box World::boundaries(std::vector<Triangle>* triangles) {
     return box;
 }
 
-void World::split_triangles(std::vector<Triangle>* source, std::vector<Triangle>* part1, std::vector<Triangle>* part2, Box bounding) {
+void World::split_triangles(std::vector<Triangle*>* source, std::vector<Triangle*>* part1, std::vector<Triangle*>* part2, Box bounding) {
     float av_x = 0.0f;
     float av_y = 0.0f;
     float av_z = 0.0f;
@@ -446,7 +448,7 @@ void World::split_triangles(std::vector<Triangle>* source, std::vector<Triangle>
     std::vector<float> zs;
 
     for (int i = 0; i < source->size(); i++) {
-        Triangle* t = &(*source)[i];
+        Triangle* t = (*source)[i];
         float x = t->a.x + t->b.x + t->c.x;
         float y = t->a.y + t->b.y + t->c.y;
         float z = t->a.z + t->b.z + t->c.z;

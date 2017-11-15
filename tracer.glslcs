@@ -100,8 +100,8 @@ vec2 intersectBox(vec3 origin, vec3 dir, box b) {
 }
 
 
-#define interesting_triangle_size 10
-#define interesting_node_size 10
+#define interesting_triangle_size 20
+#define interesting_node_size 20
 
 bool intersectTriangles(vec3 origin, vec3 dir, in int[interesting_triangle_size] triangle_indexes, out hitinfo info) {
   float smallest = -1;
@@ -161,7 +161,6 @@ vec4 trace_tree(vec3 origin, vec3 dir, out int[interesting_triangle_size] final_
   }
 
   while (interesting_nodes[int(mod(interesting_node_index, interesting_node_size))] != -1) {
-    //outDebugColor[1] = 1.0;
 
     treenode tree_node = tree[(interesting_nodes[int(mod(interesting_node_index, interesting_node_size))])];
     int node_i = tree[interesting_nodes[int(mod(interesting_node_index, interesting_node_size))]].node1_i;
@@ -205,7 +204,10 @@ vec4 trace_tree(vec3 origin, vec3 dir, out int[interesting_triangle_size] final_
     }
     interesting_node_index += 1;
   }
-  outDebugColor.g = float(interesting_node_new_index) / 30.0;
+  //outDebugColor.g = float(interesting_node_new_index) / 30.0;
+  if (interesting_node_new_index > 0) {
+    outDebugColor.r = 1.0;
+  }
   return outDebugColor;
 }
 
@@ -226,17 +228,17 @@ vec4 trace(vec3 origin, vec3 dir) {
       vec4 debugColor = trace_tree(new_position, lights[k].position - new_position, light_triangles);
       if (intersectTriangles(new_position, lights[k].position - new_position, light_triangles, j)) {
         if (j.distance < length(lights[k].position - new_position)) {
-          return (vec4(1.0, 1.0, 1.0, 1.0)); // + debugColor) / 2;
+          return (vec4(1.0, 1.0, 1.0, 1.0) + debugColor) / 2;
         }
       }
       float intensity = lights[k].intensity / ((length(lights[k].position - i.position)) * (length(lights[k].position - i.position)));
 
       vec4 gray = vec4(intensity, intensity, intensity, 1.0);
 
-      return (vec4(gray.rgb, 1.0)); // + debugColor) / 2;
+      return (vec4(gray.rgb, 1.0) + debugColor) / 2;
     }
   }
-  return (vec4(1.0, 1.0, 1.0, 1.0)); // + debugColor) / 2;
+  return (vec4(1.0, 1.0, 1.0, 1.0) + debugColor) / 2;
 }
 
 layout (local_size_x = 16, local_size_y = 8) in;
