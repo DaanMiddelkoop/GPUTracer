@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1510748730 source:c:\projects\raytraceengine\src\world.cpp
+1510776165 source:c:\projects\raytraceengine\src\world.cpp
 	"World.h"
 	<String.h>
 	<stdlib.h>
@@ -18,7 +18,7 @@
 	<TreeNode.h>
 	<Math.h>
 
-1510748688 source:c:\projects\raytraceengine\src\main.cpp
+1510780920 source:c:\projects\raytraceengine\src\main.cpp
 	<windows.h>
 	<GL/glew.h>
 	<GLFW/glfw3.h>
@@ -28,11 +28,12 @@
 	<math.h>
 	<time.h>
 
-1374502282 c:\libraries\glew-2.1.0\include\gl\glew.h
+1501529140 c:\libraries\glew-2.1.0\include\gl\glew.h
 	<stddef.h>
 	<inttypes.h>
 	<stdint.h>
 	<inttypes.h>
+	<Availability.h>
 	<OpenGL/glu.h>
 	<GL/glu.h>
 
@@ -193,4 +194,34 @@
 	"ModelLoader.h"
 
 1510668520 c:\projects\raytraceengine\include\modelloader.h
+
+1471521160 c:\libraries\glfw-3.2.1.bin.win64\include\glfw\glfw3.h
+	<stddef.h>
+	<stdint.h>
+	<OpenGL/gl3.h>
+	<OpenGL/gl3ext.h>
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL/glcorearb.h>
+	<GLES/gl.h>
+	<GLES/glext.h>
+	<GLES2/gl2.h>
+	<GLES2/gl2ext.h>
+	<GLES3/gl3.h>
+	<GLES2/gl2ext.h>
+	<GLES3/gl31.h>
+	<GLES2/gl2ext.h>
+	<vulkan/vulkan.h>
+	<GL/gl.h>
+	<GL/glext.h>
+	<GL/glu.h>
+
+1469313816 c:\libraries\glew-2.0.0\include\gl\glew.h
+	<stddef.h>
+	<inttypes.h>
+	<stdint.h>
+	<inttypes.h>
+	<Availability.h>
+	<OpenGL/glu.h>
+	<GL/glu.h>
 

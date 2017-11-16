@@ -12,7 +12,7 @@
 float horizontal_direction = 0;
 float vertical_direction = -1.5;
 
-Vector3f position(-8.0f, 10.0f, -6.0f);
+Vector3f position(0.0f, -60.0f, 0.0f);
 bool keys[200] = {false};
 
 
@@ -114,23 +114,55 @@ int main() {
     glfwSetKeyCallback(window, keyCallBack);
 
 
-    std::vector<Triangle*> triangles = std::vector<Triangle*>(1000 * 1000 * 2);
-    std::cout << 1000 * 1000 * 2 + 1 << std::endl;
+    std::vector<Triangle*> triangles = std::vector<Triangle*>(100 * 100 * 2);
+    std::cout << 100 * 100 * 2 + 1 << std::endl;
     std::cout << triangles.max_size() << std::endl;
-    for (int x = 0; x < 1000; x++) {
-        for (int y = 0; y < 1000; y++) {
+    for (int ax = 0; ax < 100; ax++) {
+        for (int ay = 0; ay < 100; ay++) {
             Triangle* tr = new Triangle();
-            tr->a = Vector3f((float)x - 1.0, -abs(sin(x / 10.0)*5) , (float)y - 1.0);
-            tr->b = Vector3f((float)x - 1.0, -abs(sin(x / 10.0)*5) ,  (float)y);
-            tr->c = Vector3f((float)x, -abs(sin(x / 10.0)*5) , (float)y);
-            triangles[((x) * 1000 + (y) ) * 2 + 0] = tr;
+
+            float x = ax - 50;
+            float y = ay - 50;
+
+            float tx;
+            float ty;
+            float tz;
+
+            float r2 = 75.0 * 75.0;
+
+            tx = x - 1.0;
+            ty = -abs(sqrt(r2 - (pow((float)x - 1.0, 2)) - pow((float)y - 1.0, 2)));
+            tz = y - 1.0;
+            tr->a = Vector3f(tx, ty, tz);
+
+            tx = (float)x - 1.0;
+            ty = -abs(sqrt(r2 - (pow((float)x - 1.0, 2)) - pow((float)y, 2)));
+            tz = (float)y;
+            tr->b = Vector3f(tx, ty, tz);
+
+            tx = (float)x;
+            ty = -abs(sqrt(r2 - (pow((float)x, 2)) - pow((float)y, 2)));
+            tz = (float)y;
+            tr->c = Vector3f(tx, ty, tz);
+            triangles[((ax) * 100 + (ay) ) * 2 + 0] = tr;
 
 
             tr = new Triangle();
-            tr->a = Vector3f((float)x - 1.0, -abs(sin(x / 10.0)*5) , (float)y - 1.0);
-            tr->b = Vector3f((float)x, -abs(sin(x / 10.0)*5) ,  (float)y - 1.0);
-            tr->c = Vector3f((float)x, -abs(sin(x / 10.0)*5) , (float)y);
-            triangles[((x) * 1000 + (y) ) * 2 + 1] = tr;
+            tx = x - 1.0;
+            ty = -abs(sqrt(r2 - (pow((float)x - 1.0, 2)) - pow((float)y - 1.0, 2)));
+            tz = y - 1.0;
+            tr->a = Vector3f(tx, ty, tz);
+
+            tx = (float)x;
+            ty = -abs(sqrt(r2 - (pow((float)x, 2)) - pow((float)y - 1.0, 2)));
+            tz = (float)y - 1.0;
+            tr->b = Vector3f(tx, ty, tz);
+
+            tx = (float)x;
+            ty = -abs(sqrt(r2 - (pow((float)x, 2)) - pow((float)y, 2)));
+            tz = (float)y;
+            tr->c = Vector3f(tx, ty, tz);
+            triangles[((ax) * 100 + (ay) ) * 2 + 1] = tr;
         }
     }
 

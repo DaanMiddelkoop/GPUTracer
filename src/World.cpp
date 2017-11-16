@@ -439,6 +439,8 @@ void World::split_triangles(std::vector<Triangle*>* source, std::vector<Triangle
     float av_y = 0.0f;
     float av_z = 0.0f;
 
+    Box bounding = boundaries(source);
+
     std::vector<float> xs;
     std::vector<float> ys;
     std::vector<float> zs;
