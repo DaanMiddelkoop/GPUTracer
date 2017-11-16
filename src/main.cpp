@@ -12,7 +12,7 @@
 float horizontal_direction = 0;
 float vertical_direction = -1.5;
 
-Vector3f position(0.0f, -60.0f, 0.0f);
+Vector3f position(0.0f, -600.0f, 0.0f);
 bool keys[200] = {false};
 
 
@@ -114,21 +114,21 @@ int main() {
     glfwSetKeyCallback(window, keyCallBack);
 
 
-    std::vector<Triangle*> triangles = std::vector<Triangle*>(100 * 100 * 2);
-    std::cout << 100 * 100 * 2 + 1 << std::endl;
+    std::vector<Triangle*> triangles = std::vector<Triangle*>(1000 * 1000 * 2);
+    std::cout << 1000 * 1000 * 2 + 1 << std::endl;
     std::cout << triangles.max_size() << std::endl;
-    for (int ax = 0; ax < 100; ax++) {
-        for (int ay = 0; ay < 100; ay++) {
+    for (int ax = 0; ax < 1000; ax++) {
+        for (int ay = 0; ay < 1000; ay++) {
             Triangle* tr = new Triangle();
 
-            float x = ax - 50;
-            float y = ay - 50;
+            float x = ax - 500;
+            float y = ay - 500;
 
             float tx;
             float ty;
             float tz;
 
-            float r2 = 75.0 * 75.0;
+            float r2 = 750.0 * 750.0;
 
             tx = x - 1.0;
             ty = -abs(sqrt(r2 - (pow((float)x - 1.0, 2)) - pow((float)y - 1.0, 2)));
@@ -144,7 +144,7 @@ int main() {
             ty = -abs(sqrt(r2 - (pow((float)x, 2)) - pow((float)y, 2)));
             tz = (float)y;
             tr->c = Vector3f(tx, ty, tz);
-            triangles[((ax) * 100 + (ay) ) * 2 + 0] = tr;
+            triangles[((ax) * 1000 + (ay) ) * 2 + 0] = tr;
 
 
             tr = new Triangle();
@@ -162,7 +162,7 @@ int main() {
             ty = -abs(sqrt(r2 - (pow((float)x, 2)) - pow((float)y, 2)));
             tz = (float)y;
             tr->c = Vector3f(tx, ty, tz);
-            triangles[((ax) * 100 + (ay) ) * 2 + 1] = tr;
+            triangles[((ax) * 1000 + (ay) ) * 2 + 1] = tr;
         }
     }
 

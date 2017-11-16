@@ -49,11 +49,18 @@ layout (std430, binding = 2) buffer triangles_b
 #define MAX_LIGHTS 1
 
 const light lights[MAX_LIGHTS] = {
-  {vec3(0.0, -60.0, 0.0), 100.0}
+  {vec3(0.0, -600.0, 0.0), 10000.0}
 };
 
 
 struct hitinfo {
+  vec3 position;
+  vec3 normal;
+  float distance;
+};
+
+struct trace_info {
+  vec4 color;
   vec3 position;
   vec3 normal;
   float distance;
@@ -101,34 +108,11 @@ vec2 intersectBox(vec3 origin, vec3 dir, box b) {
   return vec2(tNear, tFar);
 }
 
-
-#define interesting_triangle_size 20
 #define interesting_node_size 20
 
-bool intersectTriangles(vec3 origin, vec3 dir, in int[interesting_triangle_size] triangle_indexes, out hitinfo info) {
-  float smallest = -1;
-  bool found = false;
-  for (int i = 0; i < interesting_triangle_size; i++) {
-    if (triangle_indexes[i] == -1) {
-      return found; // return found; //return found;
-    }
+bool trace_tree(vec3 origin, vec3 dir, float max_dist, out trace_info info) {
 
-    vec3 normal;
-    vec4 result = intersectTriangle(origin, dir, triangles[triangle_indexes[i]], normal);
-    if (result[3] > 0.0 && (result[3] < smallest || smallest < 0)) {
-      info.distance = result[3];
-      info.position = result.xyz;
-      info.normal = normal;
-      smallest = result[3];
-      found = true;
-    }
-  }
-
-
-  return found;
-}
-
-vec4 trace_tree(vec3 origin, vec3 dir, float max_dist, out int[interesting_triangle_size] final_triangles) {
+  info.color = vec4(0.0, 0.0, 0.0, 1.0);
   int node_index = 0;
   int interesting_nodes[interesting_node_size];
 
@@ -136,28 +120,16 @@ vec4 trace_tree(vec3 origin, vec3 dir, float max_dist, out int[interesting_trian
   int interesting_node_new_index = 0;
   int triangle_node_index = 0;
 
-  vec4 outDebugColor = vec4(0.0, 0.0, 0.0, 1.0);
-
-  float distance = -1.0;
-
-
-  for (int i = 0; i < interesting_triangle_size; i++) {
-    //interesting_nodes[i] = -1;
-    final_triangles[i] = -1;
-  }
+  bool hit = false;
 
   for (int i = 0; i < interesting_node_size; i++) {
     interesting_nodes[i] = -1;
     //final_triangles[i] = 3;
   }
-
-
-
-
-  
+  float min_triangle_distance = -1;
 
   vec2 result = intersectBox(origin, dir, (tree[0]).bounding);
-  if ((result.x > 0.0 || result.y > 0.0) && result.x <= result.y && result.x < max_dist) {
+  if ((result.x > 0.0 || result.y > 0.0) && result.x <= result.y && result.x < max_dist && (min_triangle_distance < 0 || result.x < min_triangle_distance)) {
     interesting_nodes[int(mod(interesting_node_new_index, interesting_node_size))] = 0;
     interesting_node_new_index += 1;
     interesting_nodes[int(mod(interesting_node_new_index, interesting_node_size))] = -1;
@@ -171,7 +143,7 @@ vec4 trace_tree(vec3 origin, vec3 dir, float max_dist, out int[interesting_trian
 
     if (node_i != -1) {
       result = intersectBox(origin, dir, tree[node_i].bounding);
-      if ((result.x > 0.0 || result.y > 0.0) && result.x <= result.y && result.x < max_dist) {
+      if ((result.x > 0.0 || result.y > 0.0) && result.x <= result.y && result.x < max_dist  && (min_triangle_distance < 0 || result.x < min_triangle_distance)) {
           // hitted inner bounding box 1. adding to interesting list.
           interesting_nodes[int(mod(interesting_node_new_index, interesting_node_size))] = node_i;
           interesting_node_new_index += 1;
@@ -183,7 +155,7 @@ vec4 trace_tree(vec3 origin, vec3 dir, float max_dist, out int[interesting_trian
     if (node_i != 1) {
 
       vec2 res = intersectBox(origin, dir, tree[node_i].bounding);
-      if ((res.x > 0.0 || res.y > 0.0) && res.x <= res.y  && res.x < max_dist) {
+      if ((res.x > 0.0 || res.y > 0.0) && res.x <= res.y  && res.x < max_dist  && (min_triangle_distance < 0 || result.x < min_triangle_distance)) {
           // hitted inner bounding box 1. adding to interesting list.
           interesting_nodes[int(mod(interesting_node_new_index, interesting_node_size))] = node_i;
           interesting_node_new_index += 1;
@@ -191,68 +163,85 @@ vec4 trace_tree(vec3 origin, vec3 dir, float max_dist, out int[interesting_trian
       }
     }
 
-
-    
-
     int triangle_i = tree_node.triangle1_i;
     if (triangle_i != -1) {
-      final_triangles[triangle_node_index] = triangle_i;
-      triangle_node_index += 1;
+      vec3 normal;
+      vec4 intersect_result = intersectTriangle(origin, dir, triangles[triangle_i], normal);
+      if (intersect_result[3] > 0.0 && (intersect_result[3] < min_triangle_distance || min_triangle_distance < 0)) {
+        // Hit this triangle.
+        min_triangle_distance = intersect_result[3];
+        info.distance = min_triangle_distance;
+        info.color = vec4(0.0, 0.0, 0.0, 1.0);
+        info.position = intersect_result.xyz;
+        info.normal = normal;
+        hit = true;
+      }
+
+
+      //final_triangles[triangle_node_index] = triangle_i;
+      //triangle_node_index += 1;
 
     }
 
     triangle_i = tree_node.triangle2_i;
     if (triangle_i != -1) {
-      final_triangles[triangle_node_index] = triangle_i;
-      triangle_node_index += 1;
+      vec3 normal;
+      vec4 intersect_result = intersectTriangle(origin, dir, triangles[triangle_i], normal);
+
+      if (intersect_result[3] > 0.0 && (intersect_result[3] < min_triangle_distance || min_triangle_distance < 0)) {
+        // Hit this triangle.
+        min_triangle_distance = intersect_result[3];
+        info.distance = min_triangle_distance;
+        info.color = vec4(0.0, 0.0, 0.0, 1.0);
+        info.position = intersect_result.xyz;
+        info.normal = normal;
+        hit = true;
+      }
+
+      //final_triangles[triangle_node_index] = triangle_i;
+      //triangle_node_index += 1;
     }
     interesting_node_index += 1;
   }
-  outDebugColor.g = float(interesting_node_new_index) / 50.0;
-  if (interesting_node_new_index > 0) {
-    //outDebugColor.r = 1.0;
-  }
-  return outDebugColor;
+
+  //info.color.g = interesting_node_new_index / 30;
+
+  return hit;
 }
 
 vec4 trace(vec3 origin, vec3 dir) {
-
-  hitinfo i;
-  int[interesting_triangle_size] triangle_indexes;
   dir = normalize(dir);
-  
+  trace_info trace_info_triangle;;
 
-  vec4 debugColor = trace_tree(origin, dir, (999999999), triangle_indexes);
-  if (intersectTriangles(origin, dir, triangle_indexes, i)) {
+  if (trace_tree(origin, dir, (999999999), trace_info_triangle)) {
     for (int k = 0; k < MAX_LIGHTS; k++) {
 
-      int[interesting_triangle_size] light_triangles;
-      hitinfo j;
-      vec3 new_position = i.position - (dir * 0.001);
+      vec3 new_position = trace_info_triangle.position - (dir * 0.001);
       vec3 new_direction = lights[k].position - new_position;
 
-
-      float max_dist = length(lights[k].position - new_position);
-      trace_tree(new_position, new_direction, max_dist, light_triangles);
-      if (intersectTriangles(new_position, new_direction, light_triangles, j)) {
-        if (j.distance < max_dist) {
-          return (vec4(0.0, 0.0, 0.0, 1.0) + debugColor) / 2;
+      trace_info trace_info_light;
+      float max_dist = length(new_direction);
+      new_direction = normalize(new_direction);
+      if (trace_tree(new_position, new_direction, max_dist, trace_info_light)) {
+        if (trace_info_light.distance < max_dist) {
+          return (vec4(0.0, 0.0, 0.0, 1.0)) / 2;
         }
       }
-      float angle = abs(dot(new_direction, i.normal) / (length(new_direction) * (length(i.normal))));
+      float angle = abs(dot(new_direction, trace_info_triangle.normal) / (length(new_direction) * (length(trace_info_triangle.normal))));
 
-      //return vec4(angle, angle, angle, 1.0);
 
-      float intensity = (lights[k].intensity / ((length(lights[k].position - i.position)) * (length(lights[k].position - i.position)))) * angle;
 
+
+      float intensity = (lights[k].intensity / ((length(lights[k].position - trace_info_triangle.position)) * (length(lights[k].position - trace_info_triangle.position)))) * angle;
 
       vec4 gray = vec4(intensity, intensity, intensity, 1.0);
+      //gray = vec4(1.0, 1.0, 1.0, 1.0);
 
-      return (vec4(gray.rgb, 1.0) + debugColor) / 2;
+      return (vec4(gray.rgb, 1.0)) / 2 + trace_info_triangle.color / 2;
     }
-    return (vec4(0.0, 0.0, 0.0, 1.0) + debugColor) / 2;
+    return (vec4(0.0, 0.0, 0.0, 1.0)) / 2 + trace_info_triangle.color / 2;
   }
-  return (vec4(1.0, 1.0, 1.0, 1.0) + debugColor) / 2;
+  return (vec4(1.0, 1.0, 1.0, 1.0)) / 2 +  trace_info_triangle.color / 2;
 }
 
 layout (local_size_x = 16, local_size_y = 8) in;
